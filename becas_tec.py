@@ -1,112 +1,126 @@
-#No estoy muy seguro de como se asigna el porcentaje de becas en el tec así que usaremos un random
+#random para los porcentajes
 import random
 
-#Cual es el tipo de beca que se desea consultar
+# Lista de los tipos de becas, el promedio minimo y el porcentaje maximo
+catalogo_becas = [
+    ["Beca socioeconómica", 85, 60],
+    ["Beca al Talento académico", 90, 70],
+    ["Prestamo educativo", 80, 50],
+    ["Beca al talento estudiantil", 85, 50],
+    ["Beca al talento emprendedor", 85, 60],
+    ["Beca al talento creativo", 85, 60],
+    ["Beca al Talento transformador", 90, 80],
+    ["Lideres del mañana", 95, 100]
+]
+
+historial_solicitudes = []
+
+#Función para presentar la opción 1 con el catalogo de becas
+def mostrar_catalogo_becas():
+    print("\n CATÁLOGO DE BECAS")
+    i = 1
+    for beca in catalogo_becas:
+        nombre = beca[0]
+        promedio = beca[1]
+        porcentaje = beca[2]
+        print(i, ".", nombre, "- Promedio mínimo:", promedio, "- Máx:", porcentaje, "%")
+        i = i + 1
+
+#Función para mostrar las becas y seleccionar una de interes
 def p_tipo_beca():
-    print ("Estas son las becas que hay")
-    print ("Academica 1, Deportiva 2, Socioeconómica 3, Lideres del mañana 4")
-    opcion_beca = int(input("¿Cúal es la beca a la que te estas postulando?"))
+    mostrar_catalogo_becas()
+    opcion = int(input("\nIngresa el número de la beca: "))
+    indice = opcion - 1
     
-#Opcion tipo beca = o_t_p
-    if opcion_beca == 1:
-        o_t_b = "Academica"
-    elif opcion_beca == 2:
-        o_t_b = "Deportiva"
-    elif opcion_beca == 3:
-        o_t_b = "Socioeconómica"
-    elif opcion_beca == 4:
-        o_t_b = "Lideres del mañana"
+    if 0 <= indice < len(catalogo_becas):
+        return indice
     else:
-        o_t_b = "Opción no valida"
-        
-    return o_t_b
+        print("Número de opción no válido.")
+        return None
 
-#Aqui se evaluara si la solicitud entra o no
-def evaluar_solicitud(tipo_beca,promedio,semestre):
+#Evalua a los futuros alumnos y les da un valor al azar de la beca que eligio 
+def evaluar_solicitud(indice_beca, promedio, semestre, nombre_aspirante):
     
-    if tipo_beca == "Academica":
-        if promedio >= 85:
-            beca = random.randint(10,40)
-            print ("tu beca esta aprobada y tienes ", beca, " % de beca")
-        else:
-            print ("Solicitud de beca rechazada no cumples con el promedio minimo")
-            
-    elif tipo_beca == "Deportiva":
-        if promedio >= 80:
-            beca = random.randint(10,30)
-            print ("tu beca esta aprobada y tienes ", beca, " % de beca")
-        else:
-            print ("Solicitud de beca rechazada no cumples con el promedio minimo")
-        
-    elif tipo_beca == "Socioeconómica":
-        if promedio >= 90:
-            beca = random.randint(10,60)
-            print ("tu beca esta aprobada y tienes ", beca, " % de beca")
-        else:
-            print ("Solicitud de beca rechazada no cumples con el promedio minimo")
+    beca = catalogo_becas[indice_beca]
+    nombre = beca[0]
+    prom_min = beca[1]
+    tope_beca = beca[2]
     
-#Aqui tampoco estoy seguro de los limites de semestre en los que se puede solicitar la beca lideres del mañana
-#asi que puse el valor intermedio de 4to senestre
-
-    elif tipo_beca == "Lideres del mañana":
-        if promedio >= 95 and semestre <= 4:
-            beca = 100
-            print ("tu beca esta aprobada y tienes ", beca, " %de beca")
+    if nombre == "Lideres del mañana":
+        if promedio >= prom_min and semestre <= 4:
+            print("\n¡FELICIDADES", nombre_aspirante,  "Estas aprobado a la beca Lideres mañana.")
+            historial_solicitudes.append([nombre_aspirante, nombre, promedio, semestre, "100%"])
         else:
-            print ("Solicitud de beca rechazada no cumples con el promedio minimo o ya estas muy avanzado en los semestres")
-        
+            print("\n No cumples con el promedio de 95 o estás en un semestre muy avanzado.")
+    
+    elif promedio >= prom_min:
+        porcentaje = random.randint(10, tope_beca)
+        print("\n¡FELICIDADES", nombre_aspirante, "! Solicitud aprobada para", nombre, "con", porcentaje, "%")
+        historial_solicitudes.append([nombre_aspirante, nombre, promedio, semestre, str(porcentaje) + "%"])
     else:
-        print ("Tipo de beca no reconocida")
-        
+        print("\n Tu promedio (", promedio, ") es menor al mínimo requerido (", prom_min, ").\n")
 
-#Aqui se guarda la información de las becas
-def informacion(tipo_beca):
+#Función para mostrar el historial de solicitudes, y dar un folio aleatorio al alumno
+def mostrar_historial():
     
-    if tipo_beca == "Academica":
-        print ("Para esta beca necesitas un promedio minimo de 85 y podras tener hasta 40% de beca")
-    elif tipo_beca == "Deportiva":
-        print ("Para esta beca necesitas un promedio minimo de 80 y podras tener hasta 30% de beca")
-    elif tipo_beca == "Socioeconómica":
-        print ("Para esta beca necesitas un promedio minimo de 90 y podras tener hasta 60% de beca")
-    elif tipo_beca == "Lideres del mañana":
-        print ("Para esta beca necesitas un promedio minimo de 95 y tendras 100% de beca")
-    else:
-        print ("Beca no reconocida")
+    if not historial_solicitudes:
+        print("\nNo hay solicitudes registradas todavía.")
+        return
 
+    print("\n Historial de solicitudes")
+    
+    folios = list(range(5001, 5001 + len(historial_solicitudes)))
+    random.shuffle(folios)
+    
+    contador = 0
+    for sol in historial_solicitudes:
+        alumno = sol[0]
+        beca = sol[1]
+        porcentaje = sol[4]
+        
+        print("Folio:", folios[contador], "| Alumno:", alumno, "| Beca:", beca, "| Asignado:", porcentaje)
+        contador = contador + 1
 
-
-
-
-#Menu del programa
-while True:
+def main():
+    
     print (" ████ ███  ████ █████ █████ █   █  ███     ████  █████    ████  █████  ███   ███   ████    ███ █████ █████  ████ █   █ ")
     print ("█      █  █       █   █     ██ ██ █   █    █   █ █        █   █ █     █     █   █ █         █    █   █     █     ██ ██ ")
     print (" ███   █   ███    █   ████  █ █ █ █████    █   █ ████     ████  ████  █     █████  ███      █    █   ████   ███  █ █ █ ")
     print ("    █  █      █   █   █     █   █ █   █    █   █ █        █   █ █     █     █   █     █     █    █   █         █ █   █ ")
     print ("████  ███ ████    █   █████ █   █ █   █    ████  █████    ████  █████  ███  █   █ ████     ███   █   █████ ████  █   █ ")
-    print ("Tipos de Becas: 1")
-    print ("Solicitud de Becas: 2")
-    print ("Salir: 3")
-#Definimos lo que quiere hacer el usuario    
-    opcion_menu = int(input("Selecciona una opción (1,2,3): "))
     
-    if opcion_menu == 1:
-        tipo_beca = p_tipo_beca()
-        info = informacion(tipo_beca)
-        
-    elif opcion_menu == 2:
-        tipo_beca = p_tipo_beca()
-        semestre = int(input("¿Cúal es tu semestre?"))
-        promedio = float(input("¿Cúal es tu promedio?"))
-        estado = evaluar_solicitud(tipo_beca,promedio,semestre)
-        
-    elif opcion_menu == 3:
-        print ("Gracias por utilizar el sistema de becas ITESM")
-        print ("Vuelva pronto")
-        break
-    else:
-        print ("Ese es un valor no valido")
-        
-        
+    flag = True
+    while flag:
+        print("1. Consultar requisitos de becas")
+        print("2. Registrar solicitud de beca")
+        print("3. Ver historial de solicitudes")
+        print("4. Salir")
+    
+        opcion = input("\nSelecciona una opción: ")
     
     
+        match opcion:
+            case "1":
+                mostrar_catalogo_becas()
+                
+            case "2":
+                nombre_usr = input("Nombre completo del aspirante: ")
+                indice_beca = p_tipo_beca()
+            
+                if indice_beca is not None:
+                    semestre = int(input("¿Cuál es tu semestre? "))
+                    promedio = float(input("¿Cuál es tu promedio? "))
+                    evaluar_solicitud(indice_beca, promedio, semestre, nombre_usr)
+                
+            case "3":
+                mostrar_historial()
+            
+            case "4":
+                print("\nGracias por usar el sistema de becas. ¡Hasta luego!")
+                flag = False
+            
+            case _:
+                print("\nOpción no válida. Ingresa un número del 1 al 4.")
+                
+                
+main()
